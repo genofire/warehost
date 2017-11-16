@@ -1,0 +1,4 @@
+[build]
+base    = "webroot"
+publish = "webroot"
+command = "cp node_modules/semantic-ui-less/theme.config.example node_modules/semantic-ui-less/theme.config;yarn gulp build"

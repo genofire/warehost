@@ -1,0 +1,17 @@
+.status {
+	float: right;
+	background: #009ee0;
+	color: white;
+	width: 40px;
+	height: 40px;
+
+	&.connecting,
+	&.running {
+		background: #ffb400;
+	}
+	&.offline,
+	&.failed {
+		background: #dc0067;
+		color: white;
+	}
+}

@@ -1,0 +1,73 @@
+version: 2
+jobs:
+  build:
+    docker:
+      - image: circleci/golang:latest
+    working_directory: /go/src/github.com/genofire/warehost
+    steps:
+      - checkout
+      - run: go get -t -d -v ./...
+      - run: go install github.com/genofire/warehost
+      - store_artifacts:
+          path: /go/bin/
+          destination: warehost
+  test_cover:
+    docker:
+      - image: circleci/golang:latest
+    working_directory: /go/src/github.com/genofire/warehost
+    steps:
+      - checkout
+      - run: go get -t -d -v ./...
+      - run: go get github.com/mattn/goveralls
+      - run: go get golang.org/x/tools/cmd/cover
+      - run: ./.test-coverage circle-ci
+      - store_test_results:
+          path: ./
+          destination: profile.cov
+  test_race:
+    docker:
+      - image: circleci/golang:latest
+    working_directory: /go/src/github.com/genofire/warehost
+    steps:
+      - checkout
+      - run: go get -t -d -v ./...
+      - run: go test -race ./...
+  deploy:
+    docker:
+      - image: circleci/golang:latest
+    working_directory: /go/src/github.com/genofire/warehost
+    steps:
+      - checkout
+      - run: go get -t -d -v ./...
+      - run: go install github.com/genofire/warehost
+      - run: ssh -p 1512 -q -o StrictHostKeyChecking=no circleci@lupi.h.sum7.eu "sudo systemctl stop warehost"
+      - run: scp -P 1512 -q /go/bin/warehost circleci@lupi.h.sum7.eu:~/bin/warehost
+      - run: ssh -p 1512 -q circleci@lupi.h.sum7.eu "sudo systemctl start warehost"
+  deploy_gui:
+    docker:
+      - image: circleci/node:latest
+    working_directory: ~/project/webroot
+    steps:
+      - checkout
+      - run: cd webroot; yarn install
+      - run: cd webroot; cp node_modules/semantic-ui-less/theme.config.example node_modules/semantic-ui-less/theme.config
+      - run: cd webroot; yarn gulp build
+      - run: ssh -p 1512 -q -o StrictHostKeyChecking=no circleci@lupi.h.sum7.eu "rm -R ~/lib/warehost; mkdir ~/lib/warehost"
+      - run: scp -P 1512 -q webroot/index.html circleci@lupi.h.sum7.eu:~/lib/warehost/
+      - run: scp -P 1512 -q webroot/app.js circleci@lupi.h.sum7.eu:~/lib/warehost/
+      - run: scp -P 1512 -q webroot/styles.css circleci@lupi.h.sum7.eu:~/lib/warehost/
+workflows:
+  version: 2
+  build_and_tests:
+    jobs:
+      - build
+      - test_cover
+      - test_race
+      - deploy:
+          requires:
+            - build
+            - test_cover
+            - test_race
+      - deploy_gui:
+          requires:
+            - deploy

@@ -1,0 +1,13 @@
+[Unit]
+Description=Warehost
+After=network.target
+
+[Service]
+Type=simple
+User=circleci
+ExecStart=/usr/local/bin/warehost server --config /etc/warehost.conf
+Restart=always
+RestartSec=5sec
+
+[Install]
+WantedBy=multi-user.target
