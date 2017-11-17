@@ -1,3 +1,4 @@
+import * as store from './store';
 import config from './config';
 import {singelton as notify} from './element/notify';
 import {render} from './gui';
@@ -5,7 +6,7 @@ import {render} from './gui';
 const RECONNECT_AFTER = 5000,
 	RETRY_QUERY = 100,
 	query = [],
-	eventMsgID = {},
+	eventMSGID = {},
 	eventTo = {};
 
 let connectionID = localStorage.getItem('session'),
@@ -21,7 +22,7 @@ function newUUID () {
 	/* eslint-enable */
 }
 
-function correctMsg (obj) {
+function correctMSG (obj) {
 	if (!obj.id) {
 		obj.id = newUUID();
 	}
@@ -53,17 +54,18 @@ export function sendjson (obj, callback) {
 		});
 		return;
 	}
-	correctMsg(obj);
-	const socketMsg = JSON.stringify(obj);
-	socket.send(socketMsg);
+	correctMSG(obj);
+	const socketMSG = JSON.stringify(obj);
+	socket.send(socketMSG);
 	if (typeof callback === 'function') {
-		eventMsgID[obj.id] = callback;
+		eventMSGID[obj.id] = callback;
+		console.log('callback bind', obj.id);
 	}
 }
 
 function onmessage (raw) {
 	const msg = JSON.parse(raw.data),
-		msgFunc = eventMsgID[msg.id],
+		msgFunc = eventMSGID[msg.id],
 		eventFuncs = eventTo[msg.subject];
 
 	if (msg.subject === 'session_init') {
@@ -79,7 +81,7 @@ function onmessage (raw) {
 
 	if (msgFunc) {
 		msgFunc(msg);
-		delete eventMsgID[msg.id];
+		delete eventMSGID[msg.id];
 		render();
 		return;
 	}
@@ -117,6 +119,7 @@ function connect () {
 	socket.onerror = onerror;
 	socket.onmessage = onmessage;
 	socket.onclose = onclose;
+	sendjson({'subject': 'auth_status'});
 }
 
 window.setInterval(() => {
@@ -127,7 +130,6 @@ window.setInterval(() => {
 	console.log('query length: ', query.length);
 }, RETRY_QUERY);
 
-connect();
 
 export function getStatus () {
 	if (socket) {
@@ -154,3 +156,22 @@ export function delEvent (to, func) {
 		eventTo[to] = [];
 	}
 }
+
+
+setEvent('auth_status', (msg) => {
+	if (msg.body) {
+		store.isLogin = true;
+
+		store.login = msg.body;
+		notify.send({
+			'header': 'Login',
+			'type': 'info'
+		}, `Willkommen zurück ${store.login.username}!`);
+	} else {
+		store.isLogin = false;
+		store.login = {};
+	}
+	render();
+});
+
+connect();

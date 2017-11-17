@@ -33,8 +33,8 @@ var authCMD = &cobra.Command{
 			os.Exit(3)
 		}
 
-		output, _ := lib.Validate(realHashedPassword, password)
-		if output {
+		ok, _ := lib.Validate(realHashedPassword, password)
+		if ok {
 			os.Exit(0)
 		} else {
 			os.Exit(1)

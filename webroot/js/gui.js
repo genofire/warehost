@@ -13,7 +13,6 @@ export {router};
 let init = false,
 	currentView = new View();
 
-
 export function render () {
 	if (!document.body) {
 		return;
@@ -28,12 +27,13 @@ export function render () {
 		init = true;
 	}
 
+	currentView.render();
+
 	notify.render();
 	elMenu.render();
 
 	router.resolve();
 }
-
 
 export function setView (toView) {
 	currentView.unbind();

@@ -3,7 +3,7 @@ import View from '../view';
 
 
 const DELAY_OF_NOTIFY = 15000,
-	MAX_MESSAGE_SHOW = 10;
+	MAX_MESSAGE_SHOW = 5;
 
 class NotifyView extends View {
 	constructor () {
@@ -21,7 +21,7 @@ class NotifyView extends View {
 		this.render();
 	}
 
-	renderMsg (msg) {
+	renderMSG (msg) {
 		const {messages} = this,
 			content = [msg.content];
 
@@ -86,7 +86,7 @@ class NotifyView extends View {
 	}
 
 	render () {
-		V.patch(this.vel, this.vel = V.h('div', {'class': 'notifications'}, this.messages.map(this.renderMsg.bind(this))), this.el);
+		V.patch(this.vel, this.vel = V.h('div', {'class': 'notifications'}, this.messages.map(this.renderMSG.bind(this))), this.el);
 	}
 }
 // eslint-disable-next-line one-var

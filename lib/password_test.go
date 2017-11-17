@@ -15,21 +15,21 @@ func TestPassword(t *testing.T) {
 	// wrong count of hashparts
 	ok, err := Validate("$$$$$", "wrong-password")
 	assert.False(ok)
-	assert.Equal(errorNoValideHashFormat, err)
+	assert.Equal(ErrorNoValideHashFormat, err)
 
 	// hash interations not readable
 	ok, err = Validate("a$a$a$a", "wrong-password")
 	assert.False(ok)
-	assert.Equal(errorNoValideHashFormat, err)
+	assert.Equal(ErrorNoValideHashFormat, err)
 
 	// wrong password
 	ok, err = Validate(ValideDeprecatedPW, "wrong-password")
 	assert.False(ok)
-	assert.Equal(errorHashDeprecated, err)
+	assert.Equal(ErrorHashDeprecated, err)
 
 	ok, err = Validate(ValideDeprecatedPW, "root")
 	assert.True(ok)
-	assert.Equal(errorHashDeprecated, err)
+	assert.Equal(ErrorHashDeprecated, err)
 
 	// random internal hash -> no other validation exists
 	hash := NewHash("foobar")

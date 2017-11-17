@@ -19,8 +19,8 @@ const (
 	hashLength              = 20
 	interations             = 10000
 	hashfunc                = "sha256"
-	errorNoValideHashFormat = Error("no valide hash format")
-	errorHashDeprecated     = Error("deprecated hash function used, replace hashed password")
+	ErrorNoValideHashFormat = Error("no valide hash format")
+	ErrorHashDeprecated     = Error("deprecated hash function used, replace hashed password")
 )
 
 var hashlib = map[string]func() hash.Hash{
@@ -34,11 +34,11 @@ func Validate(hash, password string) (bool, error) {
 
 	parts := strings.Split(hash, "$")
 	if len(parts) != 4 {
-		return false, errorNoValideHashFormat
+		return false, ErrorNoValideHashFormat
 	}
 	curIter, err := strconv.Atoi(parts[1])
 	if err != nil {
-		return false, errorNoValideHashFormat
+		return false, ErrorNoValideHashFormat
 	}
 	hashfuncUsed := strings.Split(parts[0], "_")[1]
 
@@ -46,7 +46,7 @@ func Validate(hash, password string) (bool, error) {
 	x := fmt.Sprintf("pbkdf2_%s$%s$%s$%s", hashfuncUsed, parts[1], parts[2], base64.StdEncoding.EncodeToString(dk))
 
 	if hashfuncUsed != hashfunc {
-		err = errorHashDeprecated
+		err = ErrorHashDeprecated
 	} else {
 		err = nil
 	}
