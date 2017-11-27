@@ -4,5 +4,5 @@
 export default {
 	'title': 'Warehost',
 	// 'backend': 'wss://accounts.sum7.eu/ws'
-	'backend': `ws${location.protocol === 'https:' ? 's' : ''}://${location.host}/ws`
+	'backend': `ws${location.protocol === 'https:' ? 's' : ''}://${location.host}${location.pathname.replace(/\/$/, '')}/ws`
 };

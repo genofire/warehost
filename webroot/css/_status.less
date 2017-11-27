@@ -1,17 +1,29 @@
 .status {
-	float: right;
-	background: #009ee0;
-	color: white;
-	width: 40px;
-	height: 40px;
+	margin: 0 auto;
+	width: 12px;
+	height: 12px;
+	background-color: #80FF00;
+	border-radius: 50%;
+	box-shadow: #000 0 -1px 6px 1px, inset #460 0 -1px 8px, #80FF00 0 3px 11px;
 
 	&.connecting,
 	&.running {
-		background: #ffb400;
+		background-color: #FF0;
+		box-shadow: #000 0 -1px 6px 1px, inset #660 0 -1px 8px, #FF0 0 3px 11px;
+		animation: blinkDot 2s infinite;
 	}
 	&.offline,
 	&.failed {
-		background: #dc0067;
-		color: white;
+		background-color: #F00;
+		box-shadow: #000 0 -1px 6px 1px, inset #600 0 -1px 8px, #F00 0 3px 11px;
+		animation: blinkDot 1s infinite;
+	}
+
+
+	@keyframes blinkDot {
+		50% {
+			background-color: rgba(255, 255, 255, 0.25);
+			box-shadow: #000 0 -1px 6px 1px;
+		}
 	}
 }

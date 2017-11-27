@@ -63,7 +63,7 @@ class LoginView extends View {
 				'onclick': event
 			}, 'Login');
 
-			this.notify = domlib.newAt(this.el, 'div', {'class': 'ui hidden bottom attached segment error message'}, 'Anmeldung fehlgeschlagen!');
+			this.notify = domlib.newAt(this.el, 'div', {'class': 'ui hidden bottom attached error message'}, 'Anmeldung fehlgeschlagen!');
 
 			this.logout = domlib.newAt(this.el, 'div', {'class': 'ui info message'});
 

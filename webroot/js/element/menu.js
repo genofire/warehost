@@ -53,7 +53,7 @@ export class MenuView extends View {
 			domlib.setProps(this.el, {'class': 'ui fixed inverted menu'});
 			const menuContainer = domlib.newAt(this.el, 'div', {'class': 'ui container'});
 			this.menuRight = domlib.newAt(menuContainer, 'div', {'class': 'menu right'});
-
+			this.elStatus.classList.add('item');
 			this.menuRight.appendChild(this.elStatus);
 			this.init = true;
 		}
