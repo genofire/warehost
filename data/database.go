@@ -32,71 +32,71 @@ func (l *Login) GetInvitedby(dbconnection *gorm.DB) (invited Invite) {
 
 // Invite struct
 type Invite struct {
-	LoginID   int64 `sql:"type:bigint REFERENCES login(id) ON UPDATE CASCADE ON DELETE CASCADE;column:login;primary_key"`
+	LoginID   int64 `sql:"type:bigint REFERENCES login(id);column:login;primary_key"`
 	Login     Login `gorm:"column:login" json:"login"`
-	InvitedID int64 `sql:"type:bigint REFERENCES login(id) ON UPDATE CASCADE ON DELETE CASCADE;column:invited;primary_key"`
+	InvitedID int64 `sql:"type:bigint REFERENCES login(id);column:invited;primary_key"`
 	Invited   Login `gorm:"column:invited" json:"invited"`
 	Admin     bool  `sql:"default:false" json:"admin"`
 }
 
-// Profil struct
-type Profil struct {
+// HostProfil struct
+type HostProfil struct {
 	ID       int64
-	LoginID  int64  `sql:"type:bigint NOT NULL UNIQUE REFERENCES login(id) ON UPDATE CASCADE ON DELETE CASCADE;column:login" json:"-"`
+	LoginID  int64  `sql:"type:bigint NOT NULL UNIQUE REFERENCES login(id);column:login" json:"-"`
 	Login    *Login `gorm:"foreignkey:Login;" json:"login"`
 	Reseller bool   `sql:"default:false;column:reseller" json:"reseller"`
 }
 
 // TableName of struct
-func (Profil) TableName() string { return "host_profil" }
+func (HostProfil) TableName() string { return "host_profil" }
 
-// Domain struct
-type Domain struct {
+// HostDomain struct
+type HostDomain struct {
 	ID       int64
-	ProfilID int64   `sql:"type:bigint NOT NULL REFERENCES host_profil(id) ON UPDATE CASCADE ON DELETE CASCADE;column:profil" json:"-"`
-	Profil   *Profil `gorm:"foreignkey:Profil;" json:"profil"`
-	FQDN     string  `sql:"type:varchar(255) NOT NULL UNIQUE;column:fqdn"  json:"fqdn"`
-	Code     string  `sql:"type:varchar(255);column:code"  json:"-"`
-	Active   bool    `sql:"default:false;column:active" json:"active"`
-	Mail     bool    `sql:"default:false;column:mail" json:"mail"`
-	Web      bool    `sql:"default:false;column:web" json:"web"`
+	ProfilID int64       `sql:"type:bigint NOT NULL REFERENCES host_profil(id);column:profil" json:"-"`
+	Profil   *HostProfil `gorm:"foreignkey:Profil;" json:"profil"`
+	FQDN     string      `sql:"type:varchar(255) NOT NULL UNIQUE;column:fqdn"  json:"fqdn"`
+	Code     string      `sql:"type:varchar(255);column:code"  json:"-"`
+	Active   bool        `sql:"default:false;column:active" json:"active"`
+	Mail     bool        `sql:"default:false;column:mail" json:"mail"`
+	Web      bool        `sql:"default:false;column:web" json:"web"`
 }
 
 // TableName of struct
-func (Domain) TableName() string { return "host_domain" }
+func (HostDomain) TableName() string { return "host_domain" }
 
-// Mail struct
-type Mail struct {
+// HostMail struct
+type HostMail struct {
 	ID       int64
-	DomainID int64             `sql:"type:bigint NOT NULL REFERENCES host_domain(id) ON UPDATE CASCADE ON DELETE CASCADE;column:domain" json:"-"`
-	Domain   *Domain           `gorm:"foreignkey:Domain;unique_index:idx_host_domain_mail" json:"domain"`
-	Name     string            `sql:"type:varchar(255);column:name" gorm:"unique_index:idx_host_domain_mail" json:"name"`
-	Forwards []*MailForward    `json:"forwards"`
-	LoginID  lib.JSONNullInt64 `sql:"type:bigint NULL REFERENCES login(id) ON UPDATE CASCADE ON DELETE CASCADE;column:login" json:"login"`
+	DomainID int64              `sql:"type:bigint NOT NULL REFERENCES host_domain(id);column:domain" json:"-"`
+	Domain   *HostDomain        `gorm:"foreignkey:Domain;unique_index:idx_host_domain_mail" json:"domain"`
+	Name     string             `sql:"type:varchar(255);column:name" gorm:"unique_index:idx_host_domain_mail" json:"name"`
+	Forwards []*HostMailForward `json:"forwards"`
+	LoginID  lib.JSONNullInt64  `sql:"type:bigint NULL REFERENCES login(id);column:login" json:"login"`
 }
 
 // TableName of struct
-func (Mail) TableName() string { return "host_mail" }
+func (HostMail) TableName() string { return "host_mail" }
 
-// MailForward is a Object on with address a copy of the mail should be send
-type MailForward struct {
+// HostMailForward is a Object on with address a copy of the mail should be send
+type HostMailForward struct {
 	ID     int64
-	MailID int64  `sql:"type:bigint NOT NULL REFERENCES host_mail(id) ON UPDATE CASCADE ON DELETE CASCADE;column:mail" json:"-"`
-	Mail   *Mail  `gorm:"foreignkey:Mail;unique_index:idx_host_domain_mail_forward" json:"mail"`
-	To     string `sql:"type:varchar(255);column:to" gorm:"unique_index:idx_host_domain_mail_forward" json:"to"`
+	MailID int64     `sql:"type:bigint NOT NULL REFERENCES host_mail(id);column:mail" json:"-"`
+	Mail   *HostMail `gorm:"foreignkey:Mail;unique_index:idx_host_domain_mail_forward" json:"mail"`
+	To     string    `sql:"type:varchar(255);column:to" gorm:"unique_index:idx_host_domain_mail_forward" json:"to"`
 }
 
 // TableName of struct
-func (MailForward) TableName() string { return "host_mail_forward" }
+func (HostMailForward) TableName() string { return "host_mail_forward" }
 
 // SyncModels to verify the database schema
 func init() {
 	database.AddModel(&Login{})
 	database.AddModel(&Invite{})
-	database.AddModel(&Profil{})
-	database.AddModel(&Domain{})
-	database.AddModel(&Mail{})
-	database.AddModel(&MailForward{})
+	database.AddModel(&HostProfil{})
+	database.AddModel(&HostDomain{})
+	database.AddModel(&HostMail{})
+	database.AddModel(&HostMailForward{})
 }
 func CreateDatabase() {
 	var result int64
